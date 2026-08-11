@@ -46,10 +46,13 @@ Holding the spread fixed and varying the fraction of informed traders:
 | 0.6 | -71.3 | 27.6 |
 | 0.8 | -247.0 | 28.4 |
 
--The market maker's quotes are based on `M`, which is a step behind the true market value `V`. As `p_informed` rises, there is a higher chance that the trader is informed of the current value `V`. This means they won't buy unless they make a profit, and the market maker takes a loss.
--Noise traders buy or sell at random, with a 50% chance of doing either, meaning that, on average, they pay the market maker half the spread.
--Our P&L is the net of 2 competing forces: gains from noise flow `(1 − p) × spread/2` and losses to informed flow, which is roughly `p × (average amount you're picked off by)`
--As `p_informed` rises, the first shrinks and the second rises. In this configuration, we can see that the crossover sits at near `p_informed=0.5`
+The market maker's quotes are based on `M`, which is a step behind the true market value `V`. As `p_informed` rises, there is a higher chance that the trader is informed of the current value `V`. This means they won't buy unless they make a profit, and the market maker takes a loss.
+
+Noise traders buy or sell at random, with a 50% chance of doing either, meaning that, on average, they pay the market maker half the spread.
+
+Our P&L is the net of 2 competing forces: gains from noise flow `(1 − p) × spread/2` and losses to informed flow, which is roughly `p × (average amount you're picked off by)`
+
+As `p_informed` rises, the first shrinks and the second rises. In this configuration, we can see that the crossover sits at near `p_informed=0.5`
 
 
 ### Adverse selection
