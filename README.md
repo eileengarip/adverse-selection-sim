@@ -36,6 +36,8 @@ averaged over 100 independent runs.
 
 ## Results
 
+### Adverse selection
+
 Holding the spread fixed and varying the fraction of informed traders:
 
 | `p_informed` | mean P&L (1d.p) | standard error (1d.p) +- |
@@ -54,11 +56,14 @@ Our P&L is the net of 2 competing forces: gains from noise flow `(1 − p) × sp
 
 As `p_informed` rises, the first shrinks and the second rises. In this configuration, we can see that the crossover sits at near `p_informed=0.5`
 
-
-### Adverse selection
-
 ### Break-even spread
 
+Sweeping the spread from 0 to 1.0 at `p_informed = 0.2`:
+
+![spread curve](spread_curve.png)
+
+At zero spread, the market maker loses money outright. P&L crosses zero at a
+spread of approximately 0.06.
 
 ### The mistake that taught me most
 
