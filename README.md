@@ -21,7 +21,7 @@ ask = M + spread/2
 ```
 
 One trader arrives per step. With probability `p_informed`, they observe the true
-`V` and trade only when it is profitable for them to do so. This means buying if `V > ask` and selling if `V < bid`; otherwise, they won't trade. Otherwise, they are a noise trader who buys or sells on a coin flip regardless of price.
+`V` and trade only when the quote is wrong. This means buying if `V > ask` and selling if `V < bid`. Otherwise, they are a noise trader who buys or sells on a coin flip regardless of price.
 
 P&L (profits and losses) is tracked as cash plus inventory marked to the final true value:
 
