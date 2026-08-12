@@ -54,7 +54,7 @@ Noise traders buy or sell at random, with a 50% chance of doing either, meaning 
 
 Our P&L is the net of 2 competing forces: gains from noise flow `(1 − p) × spread/2` and losses to informed flow, which is roughly `p × (average amount you're picked off by)`
 
-As `p_informed` rises, the first shrinks and the second rises. In this configuration, we can see that the crossover sits at near `p_informed=0.5`
+As `p_informed` rises, the first shrinks and the second rises. In this configuration, at this spread and this sigma, we can see that the crossover sits near `p_informed=0.5`
 
 ### Break-even spread
 
