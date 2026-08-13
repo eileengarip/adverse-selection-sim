@@ -78,6 +78,7 @@ Here k sets how fussy the noise traders are; a lower k means that they are more 
 Now we have 2 competing effects. A wider spread earns more per trade, but fewer trades happen. Our curve now rises, peaks, and falls. 
 
 ![spread curve](spread_curve2.png)
+
 *P&L against quoted spread with noise trader arrival decay (k = 0.5, p_informed = 0.2). Averaged over 100 runs of 10,000 steps; typical standard error ±30.*
 
 I'd put the parameters in the README caption rather than the image. It's easier to edit, and
