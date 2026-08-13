@@ -79,7 +79,7 @@ Now we have 2 competing effects. A wider spread earns more per trade, but fewer 
 
 ![spread curve](spread_comparison.png)
 
-*Mean P&L against quoted spread, with and without price-sensitive noise traders. With price-insensitive noise traders (blue), P&L grows without bound — the model implies an arbitrarily wide spread is arbitrarily profitable. Adding arrival decay (orange) makes noise traders less likely to trade as the spread widens, producing an interior optimum on a plateau roughly between 0.45 and 0.65. Both curves: p_informed = 0.2, sigma = 0.1, 100 runs of 10,000 steps.*
+*Mean P&L against quoted spread, with and without price-sensitive noise traders. With price-insensitive noise traders (blue), P&L grows without bound; the model implies an arbitrarily wide spread is arbitrarily profitable. Adding arrival decay (orange) makes noise traders less likely to trade as the spread widens, producing an interior optimum on a plateau roughly between 0.45 and 0.65. Both curves: p_informed = 0.2, sigma = 0.1, 100 runs of 10,000 steps.*
 
 I'd put the parameters in the README caption rather than the image. It's easier to edit, and
 
