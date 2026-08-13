@@ -79,7 +79,7 @@ Now we have 2 competing effects. A wider spread earns more per trade, but fewer 
 
 ![spread curve](spread_curve2.png)
 
-*P&L against quoted spread with noise trader arrival decay (k = 0.5, p_informed = 0.2). Averaged over 100 runs of 10,000 steps; typical standard error ±30.*
+* P&L against quoted spread with noise trader arrival decay (k = 0.5, p_informed = 0.2). Averaged over 100 runs of 10,000 steps; typical standard error ±30. *
 
 I'd put the parameters in the README caption rather than the image. It's easier to edit, and
 
