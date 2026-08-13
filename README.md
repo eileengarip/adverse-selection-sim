@@ -81,6 +81,49 @@ Now we have 2 competing effects. A wider spread earns more per trade, but fewer 
 
 *Mean P&L against quoted spread, with and without price-sensitive noise traders. With price-insensitive noise traders (blue), P&L grows without bound; the model implies an arbitrarily wide spread is arbitrarily profitable. Adding arrival decay (orange) makes noise traders less likely to trade as the spread widens, producing an interior optimum on a plateau roughly between 0.45 and 0.65. Both curves: p_informed = 0.2, sigma = 0.1, 100 runs of 10,000 steps.*
 
+### Inventory risk and quote skewing
+
+The market maker has no directional view, but trading with whoever arrives
+still leaves it holding a position. Inventory follows a random walk, reaching
+roughly ±√n units over n steps, and that leftover position is marked against a
+price that has itself drifted. This is where the run-to-run variation in P&L
+comes from.
+
+![inventory paths](inventory_comparison.png)
+
+*Inventory over a single run, with and without skewing.*
+
+Skewing shifts both quotes against the current position rather than widening
+the spread:
+
+M_adjusted = M - skew * inventory
+
+A long position pushes both bid and ask down, making the ask more attractive
+and the bid less so, which pulls inventory back toward zero.
+
+At spread = 0.5, k = 0.5, p_informed = 0.2, over 300 runs of 10,000 steps:
+
+| `skew` | mean P&L | std. dev. | +- standard error |
+|---|---|---|---|
+| 0.0000 | 764.1 | 422.0 | 24.4 |
+| 0.0005 | 752.6 | 322.7 | 18.6 |
+| 0.0010 | 751.5 | 239.8 | 13.8 |
+| 0.0020 | 732.7 | 220.8 | 12.7 |
+| 0.0050 | 730.8 | 146.8 | 8.5 |
+| 0.0100 | 735.1 | 82.1 | 4.7 |
+| 0.0500 | 705.0 | 39.2 | 2.3 |
+| 0.1000 | 664.0 | 24.7 | 1.4 |
+
+We can see from this table that the standard deviation falls from 422.0 to 24.7 when we increase skew from 0 to 0.1. This is a result of there being less inventory when skew is higher, which is where most of the standard deviation comes from in P&L since its multiplied by V. `P&L = cash + inventory * V`. So as we increase skew inventory is pushed further to 0 and the noisy `inventory * V` term is much less significant. What's left is cash accumulation which is much more steady run to run. 
+
+We can also see that from 0-0.01 the mean stays flat within error. Only when we increase skew beyond 0.01 we start to see the mean notably drop. This is interesting because we essentially get a 4x reduction in the variance without influencing the mean significantly at a skew of 0.01. 
+
+However, beyond that further increases to skew cause a reduction in profit. We can see that when comparing a skew of 0.1 to 0 we have a mean P&L of 664.0 versus 764.1. This is a gap of 100 ± 24, about four standard errors. 
+
+So we can see that at a skew of 0.01 we get most of the risk reduction without measurable cost. 
+
+![risk-return frontier](skew_frontier.png)
+
 ---
 
 ## Limitations
