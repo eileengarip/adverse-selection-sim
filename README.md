@@ -75,13 +75,11 @@ To try and remedy this, I wanted my noise traders to sometimes look at my spread
 
 Here k sets how fussy the noise traders are; a lower k means that they are more price sensitive. E.g at `k=0.5` a spread of 0.5 keeps about 37% of the noise traders, whereas a spread of 1.0 keeps 14%.
 
-Now we have 2 competing effects. A wider spread earns more per trade, but fewer trades happen. Our curve now rises, peaks, and falls. 
+Now we have 2 competing effects. A wider spread earns more per trade, but fewer trades happen. Our curve now rises, peaks, and falls. One caveat, however, is that this decay function is invented instead of derived. Real order flow elasticity is measured empirically and isn't so predictable.
 
 ![spread curve](spread_comparison.png)
 
 *Mean P&L against quoted spread, with and without price-sensitive noise traders. With price-insensitive noise traders (blue), P&L grows without bound; the model implies an arbitrarily wide spread is arbitrarily profitable. Adding arrival decay (orange) makes noise traders less likely to trade as the spread widens, producing an interior optimum on a plateau roughly between 0.45 and 0.65. Both curves: p_informed = 0.2, sigma = 0.1, 100 runs of 10,000 steps.*
-
-One caveat though, is that this decay function is invented, not derived. Real order flow elasticity is measured empirically and doesn't have a clean form.
 
 ---
 
