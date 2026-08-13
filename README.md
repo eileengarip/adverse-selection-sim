@@ -75,9 +75,11 @@ To try and remedy this, I wanted my noise traders to sometimes look at my spread
 
 Here k sets how fussy the noise traders are; a lower k means that they are more price sensitive. E.g at `k=0.5` a spread of 0.5 keeps about 37% of the noise traders, whereas a spread of 1.0 keeps 14%.
 
-Now we have 2 competing effects. A wider spread earns more per trade, but fewer trades happen. Our curve now rises, peaks, and falls.
+Now we have 2 competing effects. A wider spread earns more per trade, but fewer trades happen. Our curve now rises, peaks, and falls. 
 
 ![spread curve](spread_curve2.png)
+
+One caveat though, is that this decay function is invented, not derived. Real order flow elasticity is measured empirically and doesn't have a clean form.
 
 ---
 
