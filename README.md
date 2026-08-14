@@ -30,7 +30,7 @@ pnl = cash + inventory * V
 ```
 
 Default parameters: `sigma = 0.1`, `p_informed = 0.2`, `n = 10000` steps,
-averaged over 100 independent runs.
+averaged over 300 independent runs.
 
 ---
 
@@ -54,7 +54,7 @@ Noise traders buy or sell at random, with a 50% chance of doing either, meaning 
 
 Our P&L is the net of 2 competing forces: gains from noise flow `(1 − p) × spread/2` and losses to informed flow, which is roughly `p × (average amount you're picked off by)`
 
-As `p_informed` rises, the first shrinks and the second rises. In this configuration, at this spread and this sigma, we can see that the crossover sits near `p_informed=0.5`
+As `p_informed` rises, the first shrinks and the second rises. In this configuration, at this spread and this sigma, we can see that the crossover sits near `p_informed=0.6`, where P&L is statistically indistinguishable from zero (-22.7 ± 36.6, only 0.6 standard errors below break-even). At `p_informed=0.4` we are clearly profitable and at `p_informed=0.8` clearly loss-making, both by more than 5 standard errors.
 
 ### Break-even spread
 
@@ -63,7 +63,7 @@ Sweeping the spread from 0 to 1.0 at `p_informed = 0.2`:
 ![spread curve](spread_curve.png)
 
 At zero spread, the market maker loses money outright. P&L crosses zero at a
-spread of approximately 0.06.
+spread of approximately 0.05.
 
 ### The mistake that taught me most
 
@@ -77,9 +77,9 @@ Here k sets how fussy the noise traders are; a lower k means that they are more 
 
 Now we have 2 competing effects. A wider spread earns more per trade, but fewer trades happen. Our curve now rises, peaks, and falls. One caveat, however, is that this decay function is invented instead of derived. Real order flow elasticity is measured empirically and isn't so predictable.
 
-![spread curve](spread_comparison.png)
+![spread comparison](spread_comparison.png)
 
-*Mean P&L against quoted spread, with and without price-sensitive noise traders. With price-insensitive noise traders (blue), P&L grows without bound; the model implies an arbitrarily wide spread is arbitrarily profitable. Adding arrival decay (orange) makes noise traders less likely to trade as the spread widens, producing an interior optimum on a plateau roughly between 0.45 and 0.65. Both curves: p_informed = 0.2, sigma = 0.1, 100 runs of 10,000 steps.*
+*Mean P&L against quoted spread, with and without price-sensitive noise traders. With price-insensitive noise traders (blue), P&L grows without bound; the model implies an arbitrarily wide spread is arbitrarily profitable. Adding arrival decay (orange) makes noise traders less likely to trade as the spread widens, producing an interior optimum on a plateau roughly between 0.35 and 0.7. Both curves: p_informed = 0.2, sigma = 0.1, 300 runs of 10,000 steps.*
 
 ### Inventory risk and quote skewing
 
@@ -114,15 +114,17 @@ At spread = 0.5, k = 0.5, p_informed = 0.2, over 300 runs of 10,000 steps:
 | 0.0500 | 706.7 | 32.0 | 1.8 |
 | 0.1000 | 662.3 | 24.1 | 1.4 |
 
-We can see from this table that the standard deviation falls from 422.0 to 24.7 when we increase skew from 0 to 0.1. This is a result of there being less inventory when skew is higher, which is where most of the standard deviation comes from in P&L since it's multiplied by V. `P&L = cash + inventory * V`. So as we increase skew, inventory is pushed further to 0, and the noisy `inventory * V` term is much less significant. What's left is cash accumulation, which is much steadier run to run. 
+We can see from this table that the standard deviation falls from 394.4 to 24.1 when we increase skew from 0 to 0.1. This is a result of there being less inventory when skew is higher, which is where most of the standard deviation comes from in P&L since it's multiplied by V. `P&L = cash + inventory * V`. So as we increase skew, inventory is pushed further to 0, and the noisy `inventory * V` term is much less significant. What's left is cash accumulation, which is much steadier run to run. 
 
-We can also see that from 0 to 0.01, the mean stays flat within error. Any cost between these values is theoretically nonzero but below measurement resolution at 300 runs. Only when we increase skew beyond 0.01 do we start to see the mean notably drop. This is interesting because we essentially get a 5x reduction in the variance without influencing the mean significantly at a skew of 0.01. 
+We can also see that from 0 to 0.01, the mean is consistent with staying flat; the drop of 42.7 is only 1.8 standard errors, so any cost between these values is theoretically nonzero but below measurement resolution at 300 runs. Only when we increase skew beyond 0.01 do we start to see the mean notably drop. This is interesting because we essentially get a 4.5x reduction in the standard deviation without influencing the mean significantly at a skew of 0.01. 
 
-However, beyond that, further increases in skew cause a reduction in profit. We can see that when comparing a skew of 0.1 to 0, we have a mean P&L of 664.0 versus 764.1. This is a gap of 100 ± 24, about four standard errors. 
+However, beyond that, further increases in skew cause a reduction in profit. We can see that when comparing a skew of 0.1 to 0, we have a mean P&L of 662.3 versus 769.5. This is a gap of 107 ± 23, about 4.7 standard errors. 
 
 So we can see that at a skew of 0.01 we get most of the risk reduction without measurable cost. 
 
 ![risk-return frontier](skew_frontier.png)
+
+*Mean P&L against standard deviation of P&L, each point labelled with its skew value. The zigzag between skew 0 and 0.002 is sampling noise rather than structure; those points differ by around one standard error. The trend is clear from 0.005 onwards.*
 
 ---
 
