@@ -29,7 +29,7 @@ P&L (profits and losses) is tracked as cash plus inventory marked to the final t
 pnl = cash + inventory * V
 ```
 
-Default parameters: `sigma = 0.1`, `p_informed = 0.2`, `n = 2000` steps,
+Default parameters: `sigma = 0.1`, `p_informed = 0.2`, `n = 10000` steps,
 averaged over 100 independent runs.
 
 ---
@@ -42,11 +42,11 @@ Holding the spread fixed and varying the fraction of informed traders:
 
 | `p_informed` | mean P&L (1d.p) | standard error (1d.p) +- |
 |---|---|---|
-| 0.0 | 536.0 | 31.0 |
-| 0.2 | 268.2 | 31.1 |
-| 0.4 | 166.9 | 27.4 |
-| 0.6 | -71.3 | 27.6 |
-| 0.8 | -247.0 | 28.4 |
+| 0.0 | 500.8 | 38.1 |
+| 0.2 | 271.1 | 36.7 |
+| 0.4 | 215.0 | 38.3 |
+| 0.6 | -22.7 | 36.6 |
+| 0.8 | -194.0 | 33.5 |
 
 The market maker's quotes are based on `M`, which is a step behind the true market value `V`. As `p_informed` rises, there is a higher chance that the trader is informed of the current value `V`. This means they won't buy unless they make a profit, and the market maker takes a loss.
 
@@ -67,11 +67,11 @@ spread of approximately 0.06.
 
 ### The mistake that taught me most
 
-In this version, we can see that P&L rises without a limit as the spread increases. The curve has no maximum. However, there is a fundamental flaw with this model. It implies that quoting a spread of 100 on an asset worth 100, i.e buying at 50, selling at 150, is better than any sensible spread. This conclusion is what makes it obvious this model is broken. 
+In this version, we can see that P&L rises without a limit as the spread increases. The curve has no maximum. However, there is a fundamental flaw with this model. It implies that quoting a spread of 100 on an asset worth 100, i.e buying at 50, selling at 150, is better than any sensible spread. This conclusion is what makes it obvious that this model is broken. 
 
 The model assumes that noise traders will continue to trade regardless of how much you exploit them (that they are price-insensitive), which in reality is not the case. For example, if you sell for an extortionate price, these traders would go elsewhere or not buy at all.
 
-To try and remedy this, I wanted my noise traders to sometimes look at my spread and decline. This means that I wanted the probability of a trade with them to decrease as the spread increases. So right before the coin flip (sells/buys), I added the line `if random.random() < math.exp(-spread / k)`. I used `exp(-spread/k)` since it's a function that is one when the spread is 0 and decays smoothly as the spread widens, as well as ranging from 0 to 1. 
+To try to remedy this, I wanted my noise traders to sometimes look at my spread and decline. This means that I wanted the probability of a trade with them to decrease as the spread increases. So right before the coin flip (sells/buys), I added the line `if random.random() < math.exp(-spread / k)`. I used `exp(-spread/k)` since it's a function that is one when the spread is 0 and decays smoothly as the spread widens, as well as ranging from 0 to 1. 
 
 Here k sets how fussy the noise traders are; a lower k means that they are more price sensitive. E.g at `k=0.5` a spread of 0.5 keeps about 37% of the noise traders, whereas a spread of 1.0 keeps 14%.
 
@@ -105,20 +105,20 @@ At spread = 0.5, k = 0.5, p_informed = 0.2, over 300 runs of 10,000 steps:
 
 | `skew` | mean P&L | std. dev. | +- standard error |
 |---|---|---|---|
-| 0.0000 | 764.1 | 422.0 | 24.4 |
-| 0.0005 | 752.6 | 322.7 | 18.6 |
-| 0.0010 | 751.5 | 239.8 | 13.8 |
-| 0.0020 | 732.7 | 220.8 | 12.7 |
-| 0.0050 | 730.8 | 146.8 | 8.5 |
-| 0.0100 | 735.1 | 82.1 | 4.7 |
-| 0.0500 | 705.0 | 39.2 | 2.3 |
-| 0.1000 | 664.0 | 24.7 | 1.4 |
+| 0.0000 | 769.5 | 394.4 | 22.8 |
+| 0.0005 | 732.3 | 384.3 | 22.2 |
+| 0.0010 | 728.1 | 280.7 | 16.2 |
+| 0.0020 | 741.4 | 231.4 | 13.4 |
+| 0.0050 | 734.1 | 142.5 | 8.2 |
+| 0.0100 | 726.8 | 88.1 | 5.1 |
+| 0.0500 | 706.7 | 32.0 | 1.8 |
+| 0.1000 | 662.3 | 24.1 | 1.4 |
 
-We can see from this table that the standard deviation falls from 422.0 to 24.7 when we increase skew from 0 to 0.1. This is a result of there being less inventory when skew is higher, which is where most of the standard deviation comes from in P&L since its multiplied by V. `P&L = cash + inventory * V`. So as we increase skew inventory is pushed further to 0 and the noisy `inventory * V` term is much less significant. What's left is cash accumulation which is much more steady run to run. 
+We can see from this table that the standard deviation falls from 422.0 to 24.7 when we increase skew from 0 to 0.1. This is a result of there being less inventory when skew is higher, which is where most of the standard deviation comes from in P&L since it's multiplied by V. `P&L = cash + inventory * V`. So as we increase skew, inventory is pushed further to 0, and the noisy `inventory * V` term is much less significant. What's left is cash accumulation, which is much steadier run to run. 
 
-We can also see that from 0-0.01 the mean stays flat within error. Only when we increase skew beyond 0.01 we start to see the mean notably drop. This is interesting because we essentially get a 4x reduction in the variance without influencing the mean significantly at a skew of 0.01. 
+We can also see that from 0 to 0.01, the mean stays flat within error. Any cost between these values is theoretically nonzero but below measurement resolution at 300 runs. Only when we increase skew beyond 0.01 do we start to see the mean notably drop. This is interesting because we essentially get a 5x reduction in the variance without influencing the mean significantly at a skew of 0.01. 
 
-However, beyond that further increases to skew cause a reduction in profit. We can see that when comparing a skew of 0.1 to 0 we have a mean P&L of 664.0 versus 764.1. This is a gap of 100 ± 24, about four standard errors. 
+However, beyond that, further increases in skew cause a reduction in profit. We can see that when comparing a skew of 0.1 to 0, we have a mean P&L of 664.0 versus 764.1. This is a gap of 100 ± 24, about four standard errors. 
 
 So we can see that at a skew of 0.01 we get most of the risk reduction without measurable cost. 
 
