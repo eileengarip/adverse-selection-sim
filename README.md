@@ -130,18 +130,59 @@ So we can see that at a skew of 0.01 we get most of the risk reduction without m
 
 ## Limitations
 
+This is a deliberately minimal model built to isolate two mechanisms: adverse selection and inventory risk. The simplifications that make those visible also leave out most of what a real market maker deals with. Below are a few of them.
+
+### Informed traders observe `V` exactly
+
+They know the true value with perfect precision, which makes them maximally dangerous. Real informed traders have a noisy signal, not 100% certainty. 
+
+Consequence: our model overstates adverse selection, so the break-even spread is too wide and the crossover `p` is too low. Also, perfect information means these traders will never trade at a loss, so we never win against them. With noisy signals, we'd sometimes profit from an informed trader who was wrong, which changes the economics.
+
+### Only one market maker
+
+In the model, the market maker (we) choose the spread, and there is no one undercutting us. In reality, competing makers bid the spread down toward the level where profit approximately covers adverse selection and inventory cost. 
+
+Consequence: the "optimal spread" this model finds is a monopolist's answer. In a competitive market, the spread is determined by entry, not chosen. So the question shifts from "what should I quote?" to "what spread does competition produce?"
+
+### No order book, queue or price-time priority
+
+We assume that when a trader arrives and wants to trade, the trade happens against us, at our quoted price. However, in real markets multiple participants post bids and offers at various prices, and then they're queued. First by price (best price wins), then by time (among equal prices, whoever posted first is served first). An incoming market order goes through that queue from the front.
+
+Consequence: real market makers manage queue position, and being early in the queue at a slightly worse price can beat being late at a better one. It also means the model has no concept of partial fills or of being adversely selected because we were at the front when informed flow arrived.
+
+### The noise trader decay function is invented
+
+`exp(-spread/k)` was chosen because it has the right shape (1 at zero spread, decaying, bounded in [0,1]), not because it was measured. Real order flow elasticity is estimated empirically and has no clean closed form. 
+
+Consequence: the location of the optimum depends directly on `k`, which we chose rather than measured. The existence of an interior optimum, however, does not. At a near-zero spread we earn almost nothing per trade; at a very wide spread almost no noise traders arrive, so we barely trade at all. P&L is therefore low at both extremes, and the maximum must sit somewhere between them. This holds for any decreasing arrival function, not just the exponential. So the model does establish that an optimal spread exists, but the particular value it reports is an input rather than a result.
+
+None of these four affects the two conclusions the model supports: that adverse selection alone can make a positive spread unprofitable, and that skewing quotes against inventory trades expected return for a large reduction in variance. Both follow from the mechanisms rather than the particular parameter values, and both would survive in a richer model. Several other simplifications are worth noting but not expanding on. There is no latency, so our quotes update the instant we decide to change them; inventory carries no funding or margin cost, so holding a large position is free, and exactly one trader arrives per step regardless of the spread, volatility, or time of day.
+
 ---
 
 ## Running it
+
+```bash
+pip install matplotlib
+python market_maker.py
+```
+
+The script prints both results tables and writes all four figures to the working directory. `random.seed(0)` is set at the top, so the output is reproducible — a fresh clone will produce the same numbers and charts shown above.
+
+Parameters are set as constants near the top of the file: `RUNS` controls repetitions per data point and `STEPS` the length of each run. Both are set to the values used throughout this README (300 and 10,000). Lowering them speeds things up considerably at the cost of wider error bars; the full run takes around twenty minutes.
 
 ---
 
 ## Next steps
 
+The clearest gap in this model is that `M` only updates with the passage of time. It never learns from the trades themselves, yet a trade is information. Someone buying at our ask is weak evidence that the true value sits above our estimate, and a market maker that ignores this is repeatedly picked off by the same signal it could have used to defend itself.
+
+The fix is to nudge `M` toward the side that was hit after each trade, so that repeated buying pulls our estimate upward. This is the Glosten–Milgrom model in its simplest form, where I have not yet read the original, but it would be the natural place to start.
+
+A second direction is competition. With two or more market makers quoting simultaneously and the trader taking the best available price, the spread would no longer be something we choose but something the competition produces — which is closer to how real spreads are set.
+
 ---
 
-## References
+## Use of AI
 
-- Glosten & Milgrom (1985), *Bid, Ask and Transaction Prices in a Specialist
-  Market with Heterogeneously Informed Traders*
-- Avellaneda & Stoikov (2008), *High-frequency Trading in a Limit Order Book*
+Claude was used throughout this project as a tutor and reviewer. It explained concepts such as adverse selection and inventory risk, pointing out bugs in my accounting and sampling, suggesting which experiments to run, and reviewing my write-up for errors. The model, the code and the analysis are my own. Where results are stated, I generated and interpreted them myself.
